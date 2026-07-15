@@ -1,0 +1,257 @@
+/* ============================================================
+   THEMES.CSS - Sélecteur de thèmes OKLCH
+   ============================================================ */
+
+/* ─── Theme picker ───────────────────────────────────────────── */
+.theme-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.theme-picker__section {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-2);
+  border-bottom: 1px solid var(--clr-border);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+/* ─── Grille thèmes ──────────────────────────────────────────── */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+/* ─── Swatch thème ───────────────────────────────────────────── */
+.theme-swatch {
+  background: var(--clr-surface);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.theme-swatch:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-swatch:active { transform: scale(0.97); }
+
+.theme-swatch--active {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary) / 0.2;
+}
+
+/* Preview mini-mockup */
+.theme-swatch__preview {
+  height: 80px;
+  background: var(--clr-bg-alt);
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-2);
+}
+
+.theme-swatch__colors {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--space-2);
+}
+
+.theme-swatch__color {
+  height: 8px;
+  flex: 1;
+  border-radius: var(--radius-full);
+}
+
+.theme-swatch__mockup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.theme-swatch__mock-bar {
+  height: 10px;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  opacity: 0.9;
+}
+
+.theme-swatch__mock-card {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  background: var(--clr-surface);
+  border-radius: var(--radius-sm);
+  padding: 4px var(--space-2);
+}
+
+.theme-swatch__mock-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.theme-swatch__mock-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.theme-swatch__mock-line {
+  height: 5px;
+  background: var(--clr-surface-3);
+  border-radius: var(--radius-full);
+}
+
+.theme-swatch__mock-line--short { width: 60%; }
+
+/* Footer swatch */
+.theme-swatch__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--clr-border);
+}
+
+.theme-swatch__emoji { font-size: 1rem; }
+
+.theme-swatch__name {
+  flex: 1;
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text);
+}
+
+.theme-swatch__check {
+  font-size: 18px;
+  color: var(--clr-primary);
+  --mat-icon-fill: 1;
+}
+
+/* ─── Éditeur custom OKLCH ───────────────────────────────────── */
+.theme-custom-editor {
+  background: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.theme-custom-editor__colors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.theme-color-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.theme-color-row__label {
+  margin-bottom: 0;
+}
+
+.theme-color-row__inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.theme-color-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  border: 2px solid var(--clr-border);
+  transition: background var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Sliders OKLCH */
+.oklch-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: var(--radius-full);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Slider Luminosité (L) */
+.oklch-slider--l {
+  background: linear-gradient(
+    to right,
+    oklch(20% 0.1 250),
+    oklch(90% 0.1 250)
+  );
+}
+
+/* Slider Chroma (C) */
+.oklch-slider--c {
+  background: linear-gradient(
+    to right,
+    oklch(60% 0 250),
+    oklch(60% 0.35 250)
+  );
+}
+
+/* Slider Teinte (H) */
+.oklch-slider--h {
+  background: linear-gradient(
+    to right,
+    oklch(65% 0.2 0),
+    oklch(65% 0.2 60),
+    oklch(65% 0.2 120),
+    oklch(65% 0.2 180),
+    oklch(65% 0.2 240),
+    oklch(65% 0.2 300),
+    oklch(65% 0.2 360)
+  );
+}
+
+.oklch-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--clr-border-strong);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.oklch-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  border-color: var(--clr-primary);
+}
+
+.oklch-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--clr-border-strong);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
