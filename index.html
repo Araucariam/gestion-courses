@@ -6,34 +6,84 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description"
     content="Gestion de courses — Organisez vos listes de courses facilement." />
-  <meta name="theme-color"
-    content="#4f71d4"
-    media="(prefers-color-scheme: light)" />
-  <meta name="theme-color"
-    content="#6b8ef0"
-    media="(prefers-color-scheme: dark)" />
-
-  <!-- PWA -->
+  <meta name="theme-color" content="#4f71d4" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Courses" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Gestion de Courses" />
-  <meta property="og:description"
-    content="Gérez vos listes de courses facilement et efficacement." />
-  <meta property="og:type" content="website" />
-
   <title>Gestion de Courses</title>
-  <link rel="manifest" href="/manifest.json" />
 
-  <!-- Apple icons -->
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+  <!-- ── Base URL dynamique pour GitHub Pages ───────────────── -->
+  <script>
+    // Détecter si on est sur GitHub Pages ou domaine custom
+    (function () {
+      const hostname = location.hostname;
+      const pathname = location.pathname;
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
-  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png" />
+      // GitHub Pages : username.github.io/repo-name/
+      const isGitHubPages = hostname.endsWith('github.io');
+
+      if (isGitHubPages) {
+        // Extraire le nom du repo depuis le path
+        // ex: /gestion-courses/ → base = /gestion-courses/
+        const parts = pathname.split('/').filter(Boolean);
+        window.__BASE_PATH__ = parts.length > 0 ? '/' + parts[0] + '/' : '/';
+      } else {
+        // Netlify, Vercel, domaine custom → racine
+        window.__BASE_PATH__ = '/';
+      }
+
+      console.info('[App] BASE_PATH:', window.__BASE_PATH__);
+    })();
+  </script>
+
+  <!-- ── Manifest avec chemin dynamique ─────────────────────── -->
+  <script>
+    // Injecter le bon lien manifest selon l'environnement
+    (function () {
+      const base = window.__BASE_PATH__ || '/';
+      const link = document.createElement('link');
+      link.rel  = 'manifest';
+      link.href = base + 'manifest.json';
+      document.head.appendChild(link);
+
+      // Apple touch icon
+      const apple = document.createElement('link');
+      apple.rel  = 'apple-touch-icon';
+      apple.href = base + 'assets/icons/icon-192.png';
+      document.head.appendChild(apple);
+
+      // Favicon
+      const favicon = document.createElement('link');
+      favicon.rel  = 'icon';
+      favicon.type = 'image/svg+xml';
+      favicon.href = base + 'assets/icons/favicon.svg';
+      document.head.appendChild(favicon);
+    })();
+  </script>
+
+  <!-- ── Restaurer l'URL après redirection 404 GitHub Pages ──── -->
+  <script>
+    (function () {
+      // Récupérer le paramètre ?p= injecté par 404.html
+      var search = window.location.search;
+      if (search && search.startsWith('?p=')) {
+        var decoded = decodeURIComponent(search.slice(3));
+        // Séparer path et query string
+        var parts = decoded.split('&');
+        var path  = parts[0] || '';
+        var query = parts.slice(1).join('&');
+  
+        var base  = window.__BASE_PATH__ || '/';
+        var newUrl = base + path + (query ? '?' + query : '');
+  
+        // Remplacer l'URL sans recharger
+        window.history.replaceState(null, '', newUrl);
+        console.info('[SPA] URL restaurée:', newUrl);
+      }
+    })();
+  </script>
 
   <!-- Google Fonts + Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,35 +97,118 @@
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
   />
 
-  <!-- CSS — ordre important -->
-  <link rel="stylesheet" href="/css/main.css" />
-  <link rel="stylesheet" href="/css/sidebar.css" />
-  <link rel="stylesheet" href="/css/modals.css" />
-  <link rel="stylesheet" href="/css/cards.css" />
-  <link rel="stylesheet" href="/css/animations.css" />
-  <link rel="stylesheet" href="/css/voice.css" />
-  <link rel="stylesheet" href="/css/templates.css" />
-  <link rel="stylesheet" href="/css/themes.css" />
+  <!-- CSS — chemins relatifs (fonctionnent partout) -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/modals.css" />
+  <link rel="stylesheet" href="css/cards.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/voice.css" />
+  <link rel="stylesheet" href="css/templates.css" />
+  <link rel="stylesheet" href="css/themes.css" />
 
-  <!-- Préchargement des polices -->
-  <link
-    rel="preload"
-    href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2"
-    as="font"
-    type="font/woff2"
-    crossorigin
-  />
+  <!-- ── Splash screen inline ───────────────────────────────── -->
+  <style>
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: oklch(98% 0.005 250);
+      z-index: 99999;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    [data-theme="dark"] #app-splash {
+      background: oklch(12% 0.012 250);
+    }
+    #app-splash.splash--hidden {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+    .splash__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: splash-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes splash-in {
+      from { opacity: 0; transform: scale(0.8) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .splash__icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg,
+        oklch(55% 0.22 250), oklch(60% 0.2 290));
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px oklch(55% 0.22 250 / 0.4);
+      animation: splash-pulse 1.5s ease-in-out 0.3s infinite;
+    }
+    @keyframes splash-pulse {
+      0%,100% { box-shadow: 0 8px 32px oklch(55% 0.22 250 / 0.4); }
+      50%      { box-shadow: 0 8px 48px oklch(55% 0.22 250 / 0.65); }
+    }
+    .splash__icon .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded', sans-serif;
+      font-size: 40px;
+      color: white;
+      font-variation-settings: 'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 40;
+    }
+    .splash__title {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: oklch(18% 0.02 250);
+      letter-spacing: -0.02em;
+    }
+    [data-theme="dark"] .splash__title {
+      color: oklch(94% 0.008 250);
+    }
+    .splash__loader {
+      width: 120px;
+      height: 3px;
+      background: oklch(88% 0.01 250);
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+    [data-theme="dark"] .splash__loader {
+      background: oklch(28% 0.018 250);
+    }
+    .splash__loader-bar {
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 40%;
+      background: linear-gradient(90deg,
+        oklch(55% 0.22 250), oklch(60% 0.2 290));
+      border-radius: 9999px;
+      animation: splash-progress 1.2s ease-in-out infinite;
+    }
+    @keyframes splash-progress {
+      0%   { left: -40%; }
+      100% { left: 100%; }
+    }
+    @media (prefers-color-scheme: dark) {
+      html:not([data-theme="light"]) #app-splash {
+        background: oklch(12% 0.012 250);
+      }
+      html:not([data-theme="light"]) .splash__title {
+        color: oklch(94% 0.008 250);
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- ══════════════════════════════════════════════════════════
-       Point de montage de l'application
-       Tout le DOM est généré dynamiquement par JS
-  ════════════════════════════════════════════════════════════ -->
   <div id="app-root">
-
-    <!-- Splash screen (visible avant JS) -->
+    <!-- Splash screen -->
     <div id="app-splash" aria-hidden="true">
       <div class="splash__content">
         <div class="splash__icon">
@@ -87,230 +220,84 @@
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- ── Styles splash (inline pour vitesse) ──────────────────── -->
-  <style>
-    /* Splash screen — visible immédiatement, avant le CSS principal */
-    #app-splash {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: oklch(98% 0.005 250);
-      z-index: 99999;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-
-    [data-theme="dark"] #app-splash {
-      background: oklch(12% 0.012 250);
-    }
-
-    #app-splash.splash--hidden {
-      opacity: 0;
-      transform: scale(1.05);
-      pointer-events: none;
-    }
-
-    .splash__content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      animation: splash-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-
-    @keyframes splash-in {
-      from { opacity: 0; transform: scale(0.8) translateY(20px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .splash__icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(
-        135deg,
-        oklch(55% 0.22 250),
-        oklch(60% 0.2 290)
-      );
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 32px oklch(55% 0.22 250 / 0.4);
-      animation: splash-pulse 1.5s ease-in-out 0.3s infinite;
-    }
-
-    @keyframes splash-pulse {
-      0%, 100% { box-shadow: 0 8px 32px oklch(55% 0.22 250 / 0.4); }
-      50%       { box-shadow: 0 8px 48px oklch(55% 0.22 250 / 0.6); }
-    }
-
-    .splash__icon .material-symbols-rounded {
-      font-family: 'Material Symbols Rounded', sans-serif;
-      font-size: 40px;
-      color: white;
-      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 40;
-    }
-
-    .splash__title {
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: oklch(18% 0.02 250);
-      letter-spacing: -0.02em;
-    }
-
-    [data-theme="dark"] .splash__title {
-      color: oklch(94% 0.008 250);
-    }
-
-    .splash__loader {
-      width: 120px;
-      height: 3px;
-      background: oklch(88% 0.01 250);
-      border-radius: 9999px;
-      overflow: hidden;
-    }
-
-    [data-theme="dark"] .splash__loader {
-      background: oklch(28% 0.018 250);
-    }
-
-    .splash__loader-bar {
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        oklch(55% 0.22 250),
-        oklch(60% 0.2 290)
-      );
-      border-radius: 9999px;
-      animation: splash-progress 1.2s ease-in-out infinite;
-    }
-
-    @keyframes splash-progress {
-      0%   { left: -40%; width: 40%; transform: translateX(-100%); }
-      50%  { left: 100%; width: 40%; }
-      100% { left: 100%; width: 0; }
-    }
-
-    /* Appliquer thème système avant JS */
-    @media (prefers-color-scheme: dark) {
-      html:not([data-theme="light"]) #app-splash {
-        background: oklch(12% 0.012 250);
-      }
-      html:not([data-theme="light"]) .splash__title {
-        color: oklch(94% 0.008 250);
-      }
-      html:not([data-theme="light"]) .splash__loader {
-        background: oklch(28% 0.018 250);
-      }
-    }
-  </style>
-
-  <!-- ── Scripts — ordre de chargement critique ───────────────── -->
-
-  <!-- 1. Données par défaut -->
-  <script src="/data/defaultCategories.js"></script>
-
-  <!-- 2. Utilitaires (pas de dépendances) -->
-  <script src="/js/utils.js"></script>
-
-  <!-- 3. Store (dépend de Utils) -->
-  <script src="/js/store.js"></script>
-
-  <!-- 4. Router (dépend de Store) -->
-  <script src="/js/router.js"></script>
-
-  <!-- 5. Notifications (dépend de Store) -->
-  <script src="/js/notifications.js"></script>
-
-  <!-- 6. Modales (dépend de Store, Utils) -->
-  <script src="/js/modals.js"></script>
-
-  <!-- 7. Sidebar (dépend de Store, Router) -->
-  <script src="/js/sidebar.js"></script>
-
-  <!-- 8. Catégories (dépend de Store, Modals) -->
-  <script src="/js/categories.js"></script>
-
-  <!-- 9. Listes (dépend de Store, Router, Modals, Notifications) -->
-  <script src="/js/lists.js"></script>
-
-  <!-- 10. Produits (dépend de Store, Categories, Modals) -->
-  <script src="/js/products.js"></script>
-
-  <!-- 11. Import/Export (dépend de Store, Modals) -->
-  <script src="/js/importExport.js"></script>
-
-  <!-- 12. UI (dépend de tout) -->
-  <script src="/js/ui.js"></script>
-
-  <!-- 13. App — point d'entrée principal -->
-  <script src="/js/app.js"></script>
-
-  <script src="/js/voice.js"></script>
-  <script src="/js/templates.js"></script>
-  <script src="/js/themes.js"></script>
-  <script src="/js/gestures.js"></script>
-
-  <!-- ── Détection thème système avant rendu ───────────────────── -->
+  <!-- ── Thème immédiat (avant CSS) ─────────────────────────── -->
   <script>
-    // Appliquer le thème sauvegardé immédiatement (avant CSS)
     (function () {
       try {
-        const settings = JSON.parse(localStorage.getItem('gc_settings') || '{}');
-        const theme    = settings.theme || 'light';
-
+        const s = JSON.parse(localStorage.getItem('gc_settings') || '{}');
+        const theme = s.theme || 'light';
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
         } else if (theme === 'auto') {
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.documentElement.setAttribute(
-            'data-theme', prefersDark ? 'dark' : 'light'
-          );
-        } else {
-          document.documentElement.setAttribute('data-theme', 'light');
+          const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', dark ? 'dark':'light');
         }
-
-        // Mode compact
-        if (settings.compactMode) {
+        if (s.compactMode) {
           document.documentElement.classList.add('compact-mode');
         }
-      } catch (e) {
-        // Silencieux — utiliser le thème par défaut
-      }
+      } catch (e) {}
     })();
   </script>
 
-  <!-- ── Script de masquage du splash ─────────────────────────── -->
+  <!-- ── Scripts — chemins relatifs ────────────────────────── -->
+  <script src="data/defaultCategories.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/lists.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/importExport.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/gestures.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- ── Enregistrement SW avec bon scope ───────────────────── -->
   <script>
-    // Masquer le splash screen quand l'app est prête
-    document.addEventListener('DOMContentLoaded', function () {
-      // Écouter l'événement app:ready du store
-      const hideSplash = function () {
-        const splash = document.getElementById('app-splash');
-        if (!splash) return;
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const base = window.__BASE_PATH__ || '/';
+          const reg  = await navigator.serviceWorker.register(
+            base + 'sw.js',
+            { scope: base }
+          );
+          console.info('[SW] Enregistré — scope:', reg.scope);
+        } catch (e) {
+          console.warn('[SW] Erreur enregistrement:', e.message);
+        }
+      });
+    }
+  </script>
+
+  <!-- ── Masquer splash quand prêt ──────────────────────────── -->
+  <script>
+    (function () {
+      var fallback = setTimeout(hideSplash, 4000);
+
+      function hideSplash() {
+        clearTimeout(fallback);
+        var splash = document.getElementById('app-splash');
+        if (!splash || splash.classList.contains('splash--hidden')) return;
         splash.classList.add('splash--hidden');
-        setTimeout(function () {
-          splash.remove();
-        }, 450);
-      };
+        setTimeout(function () { splash.remove(); }, 450);
+      }
 
-      // Fallback si l'event ne se déclenche pas
-      const fallbackTimer = setTimeout(hideSplash, 3000);
-
-      // Écouter via Store quand il sera initialisé
-      const checkReady = setInterval(function () {
-        if (window.Store && window.App && window.App.isReady) {
-          clearInterval(checkReady);
-          clearTimeout(fallbackTimer);
-          setTimeout(hideSplash, 200);
+      var check = setInterval(function () {
+        if (window.App && window.App.isReady) {
+          clearInterval(check);
+          setTimeout(hideSplash, 150);
         }
       }, 100);
-    });
+    })();
   </script>
 
 </body>
